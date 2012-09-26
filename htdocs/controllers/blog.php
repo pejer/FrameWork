@@ -11,7 +11,6 @@ class blog extends \undertow\controller\Controller{
     public function index($page){
         $d = $this->kernel->DIget('\\undertow\\theme\\Page', __DIR__.'/../theme/index.tpl');
         $d->setData('variableName','Henrik');
-        echo "\n\n\n\n\n";
         echo $d->render();
         return false;
         # lets open a file

@@ -18,29 +18,31 @@ class Router {
         $this->response      = $Response;
     }
 
-    public function matchRoutes($routes) {
+    public function matchRoutes($routes = NULL) {
         # so lets figure out what route is the closest, ok....?
-        foreach ($routes as $route) {
-            $route = array_merge($this->defaultRouteValues,$route);
-            if ($route['method'] == '*' || $route['method'] == $this->requestMethod) {
-                if (FALSE !== ($args = $this->match($route))) {
-                    if (isset($route['alias'])) {
-                        $newRoute = $routes[$route['alias']['name']];
-                        $args     = $route['alias']['args'];
-                        $route    = $newRoute;
-                    }
-                    if (isset($route['redirect'])) {
-                        $this->event->trigger('router.redirect', $route['redirect']);
-                        $this->response->redirect($route['redirect']);
-                    }
-                    if (isset($route['alias'])) { # this is tricky - basically change URL and then rerun all the routes, again, for a match.
+        if(isset($routes) && is_array($routes)){
+            foreach ($routes as $route) {
+                $route = array_merge($this->defaultRouteValues,$route);
+                if ($route['method'] == '*' || $route['method'] == $this->requestMethod) {
+                    if (FALSE !== ($args = $this->match($route))) {
+                        if (isset($route['alias'])) {
+                            $newRoute = $routes[$route['alias']['name']];
+                            $args     = $route['alias']['args'];
+                            $route    = $newRoute;
+                        }
+                        if (isset($route['redirect'])) {
+                            $this->event->trigger('router.redirect', $route['redirect']);
+                            $this->response->redirect($route['redirect']);
+                        }
+                        if (isset($route['alias'])) { # this is tricky - basically change URL and then rerun all the routes, again, for a match.
 
+                        }
+                        $__returnRoute__             = new \StdClass();
+                        $__returnRoute__->controller = $route['controller'];
+                        $__returnRoute__->method     = $route['function'];
+                        $__returnRoute__->args       = $args;
+                        return $__returnRoute__;
                     }
-                    $__returnRoute__             = new \StdClass();
-                    $__returnRoute__->controller = $route['controller'];
-                    $__returnRoute__->method     = $route['function'];
-                    $__returnRoute__->args       = $args;
-                    return $__returnRoute__;
                 }
             }
         }

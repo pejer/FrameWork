@@ -43,7 +43,7 @@ class Page {
         #$this->templateFileContents = file_get_contents($this->templateFile);
         $this->renderTags();
         $this->handleCommands();
-        return $this->templateFileContents;
+        return trim($this->templateFileContents);
     }
 
     protected function renderTags() {
@@ -53,8 +53,8 @@ class Page {
         $indentLevel = 0;
         foreach ($lines as $this->lineProcessed) {
             $line = rtrim(str_replace("\t", '    ', $this->lineProcessed));
-            if($line{0} === '.'){
-                $this->templateFileContents .= substr($line,1);
+            if(substr(trim($line),0,1) === '|'){
+                $this->templateFileContents .= "\n".substr(trim($line),1);
                 continue;
             }
             preg_match('#([\040]{0,})([a-z0-1]+)([\.\#]{0,1}[^\.\#\( ]{0,})([\.\#]{0,1}[^\.\#\( ]{0,})(.*$)#i', $line, $matches);
@@ -75,12 +75,17 @@ class Page {
             $content    = trim($matches[5]);
             $attributes = array();
             if (!empty($content) && $content{0} == '(') {
-                preg_match("#\((.*)\)(.*$)#", $content, $attrMatch);
+                preg_match("#\(([^ ) ]*)\)(.*$)#", $content, $attrMatch);
                 $content    = trim($attrMatch[2]);
                 $attribs    = explode(',', $attrMatch[1]);
                 $attributes = '';
                 foreach ($attribs as $attrib) {
-                    $attributes[substr($attrib, 0, strpos($attrib, '='))] = substr($attrib, (strpos($attrib, '=') + 1));
+                    if(strpos($attrib,'=') === FALSE){
+                        $attributes[$attrib] = NULL;
+                    }else{
+                        $attributes[substr($attrib, 0, strpos($attrib, '='))] = substr($attrib, (strpos($attrib, '=') + 1));
+                    }
+
                 }
             }
             $class = NULL;
@@ -136,7 +141,11 @@ class Page {
         $this->templateFileContents .= "<$tag";
         if (isset($attributes)) {
             foreach ($attributes as $attribute => $value) {
-                $this->templateFileContents .= " {$attribute}={$value}";
+                if(!isset($value)){
+                    $this->templateFileContents .= " {$attribute}";
+                }else{
+                    $this->templateFileContents .= " {$attribute}={$value}";
+                }
             }
         }
         $this->templateFileContents .= ">{$content}";

@@ -1,6 +1,6 @@
 <?php
 declare( encoding = "UTF8" ) ;
-namespace Undertow\autoload;
+namespace undertow\autoload;
 
 /**
  *

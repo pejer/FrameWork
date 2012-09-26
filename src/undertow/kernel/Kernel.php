@@ -23,7 +23,6 @@ class Kernel implements kernelinterface{
         $this->response->startOb();
         $this->loadRequest();
         $this->DIaddAlias($this->request,'Request');
-        echo "Url is : ".$this->request->getUrl()."<br>";
     }
 
     public function DIget(){
@@ -67,10 +66,12 @@ class Kernel implements kernelinterface{
     }
 
     public function boot(){
+
         $router = $this->DIget('Router');
         $route = $router->matchRoutes($this->routes);
         if($route == FALSE){
-            echo "Oh darn it : 404 DUDE!<br>";
+            # 404, right?
+            throw new \RuntimeException(NULL,404);
         }else{
             $o = $this->DIget($route->controller);
             call_user_func_array(array($o, $route->method),$route->args);
