@@ -2,7 +2,7 @@
 declare(encoding = "UTF8");
 namespace  undertow\request;
 
-class HttpRequest extends request{
+class HttpRequest extends Request{
 
     public function __construct(){
         parent::__construct($_GET, $_POST,$_FILES,$_COOKIE, $_SERVER);
